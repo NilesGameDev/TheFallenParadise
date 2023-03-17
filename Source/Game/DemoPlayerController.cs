@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using ArizonaFramework;
 using FlaxEngine;
 
 namespace Game
@@ -7,7 +8,7 @@ namespace Game
     /// <summary>
     /// DemoPlayerController Script.
     /// </summary>
-    public class DemoPlayerController : Script
+    public class DemoPlayerController : PlayerPawn
     {
         /// <inheritdoc/>
         public override void OnStart()
