@@ -23,5 +23,6 @@ public class Game : GameModule
         // To reference another module use: options.PublicDependencies.Add("Audio");
         // To add C++ define use: options.PublicDefinitions.Add("COMPILE_WITH_FLAX");
         // To learn more see scripting documentation.
+        options.PrivateDependencies.Add("ArizonaFramework");
     }
 }
