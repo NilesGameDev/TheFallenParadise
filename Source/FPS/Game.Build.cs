@@ -9,7 +9,7 @@ public class Game : GameModule
         base.Init();
 
         // C#-only scripting
-        BuildNativeCode = false;
+        BuildNativeCode = true;
     }
 
     /// <inheritdoc />

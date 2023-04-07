@@ -1,25 +1,22 @@
-﻿using FlaxEngine;
-using System;
+﻿using System;
+using FlaxEngine;
 
-namespace Game
+namespace FPS.Movement
 {
     /// <summary>
-    /// Player Script.
+    /// PlayerMovement Script.
     /// </summary>
-    public class Player : Script
+    public class PlayerMovement : Script
     {
         public CharacterController PlayerController;
         public Actor CameraTarget;
         public Camera Camera;
 
-        public Model SphereModel;
-
+        public Float2 PitchMinMax = new Float2(-88, 88);
         public float CameraSmoothing = 20.0f;
+        public bool IsMotionBlur = true;
 
-        public bool CanJump = true;
-        public bool UseMouse = true;
         public float JumpForce = 800;
-
         public float Friction = 8.0f;
         public float GroundAccelerate = 5000;
         public float AirAccelerate = 10000;
@@ -40,65 +37,13 @@ namespace Game
         /// <param name="vertical">The vertical input.</param>
         /// <param name="pitch">The pitch rotation input.</param>
         /// <param name="yaw">The yaw rotation input.</param>
-        public void AddMovementRotation(float horizontal, float vertical, float pitch, float yaw)
+        public void AddMovement(float horizontal, float vertical, float pitch, float yaw, bool jump)
         {
-            _pitch += pitch;
+            _pitch = Mathf.Clamp(_pitch + pitch, PitchMinMax.MinValue, PitchMinMax.MaxValue);
             _yaw += yaw;
             _horizontal += horizontal;
             _vertical += vertical;
-        }
-
-        public override void OnUpdate()
-        {
-            if (UseMouse)
-            {
-                // Cursor
-                Screen.CursorVisible = false;
-                Screen.CursorLock = CursorLockMode.Locked;
-
-                // Mouse
-                var mouseDelta = new Float2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-                _pitch = Mathf.Clamp(_pitch + mouseDelta.Y, -88, 88);
-                _yaw += mouseDelta.X;
-            }
-
-            // Jump
-            if (CanJump && Input.GetAction("Jump"))
-                _jump = true;
-
-            // Shoot
-            if (Input.GetAction("Fire"))
-            {
-                var ball = new RigidBody
-                {
-                    Name = "Bullet",
-                    StaticFlags = StaticFlags.None,
-                    UseCCD = true,
-                };
-                var ballModel = new StaticModel
-                {
-                    Model = SphereModel,
-                    Parent = ball,
-                    StaticFlags = StaticFlags.None
-                };
-                var ballCollider = new SphereCollider
-                {
-                    Parent = ball,
-                    StaticFlags = StaticFlags.None
-                };
-                ball.Transform = new Transform(
-                    CameraTarget.Position + Horizontal(CameraTarget.Direction) * 70.0f,
-                    Quaternion.Identity,
-                    new Vector3(0.1f));
-                Level.SpawnActor(ball);
-                ball.LinearVelocity = CameraTarget.Direction * 600.0f;
-                Destroy(ball, 5.0f);
-            }
-        }
-
-        private Vector3 Horizontal(Vector3 v)
-        {
-            return new Vector3(v.X, 0, v.Z);
+            _jump = jump;
         }
 
         public override void OnFixedUpdate()
@@ -106,14 +51,15 @@ namespace Game
             // Update camera
             var camTrans = Camera.Transform;
             var camFactor = Mathf.Saturate(CameraSmoothing * Time.DeltaTime);
-            CameraTarget.LocalOrientation = Quaternion.Lerp(CameraTarget.LocalOrientation, Quaternion.Euler(_pitch, _yaw, 0), camFactor);
-            //CameraTarget.LocalOrientation = Quaternion.Euler(pitch, yaw, 0);
+            CameraTarget.LocalOrientation = IsMotionBlur
+                ? Quaternion.Lerp(CameraTarget.LocalOrientation, Quaternion.Euler(_pitch, _yaw, 0), camFactor)
+                : Quaternion.Euler(_pitch, _yaw, 0);
             camTrans.Translation = Vector3.Lerp(camTrans.Translation, CameraTarget.Position, camFactor);
             camTrans.Orientation = CameraTarget.Orientation;
             Camera.Transform = camTrans;
 
-            var inputH = Input.GetAxis("Horizontal") + _horizontal;
-            var inputV = Input.GetAxis("Vertical") + _vertical;
+            var inputH = _horizontal;
+            var inputV = _vertical;
             _horizontal = 0;
             _vertical = 0;
 
@@ -162,6 +108,11 @@ namespace Game
             _velocity = velocity;
         }
 
+        private Vector3 Horizontal(Vector3 v)
+        {
+            return new Vector3(v.X, 0, v.Z);
+        }
+
         // accelDir: normalized direction that the player has requested to move (taking into account the movement keys and look direction)
         // prevVelocity: The current velocity of the player, before any additional calculations
         // accelerate: The server-defined player acceleration value
@@ -200,8 +151,8 @@ namespace Game
 
         public override void OnDebugDraw()
         {
-            //var trans = PlayerController.Transform;
-            //DebugDraw.DrawWireTube(trans.Translation, trans.Orientation * Quaternion.Euler(90, 0, 0), PlayerController.Radius, PlayerController.Height, Color.Blue);
+            var trans = PlayerController.Transform;
+            DebugDraw.DrawWireTube(trans.Translation, trans.Orientation * Quaternion.Euler(90, 0, 0), PlayerController.Radius, PlayerController.Height, Color.Blue);
         }
     }
 }
