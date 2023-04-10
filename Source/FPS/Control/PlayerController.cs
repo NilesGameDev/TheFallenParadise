@@ -16,6 +16,7 @@ namespace FPS.Control
         public Actor WeaponHolder;
 
         private PlayerMovement _playerMovement;
+        private FpsMotion _fpsMotion;
 
         /// <inheritdoc/>
         public override void OnStart()
@@ -29,6 +30,10 @@ namespace FPS.Control
             {
                 Debug.LogWarning("No PlayerMovement script is attached to the PlayerController!");
             }
+            if (!Actor.TryGetScript(out _fpsMotion))
+            {
+                Debug.LogWarning("No FpsMotion script is attached to the PlayerController!");
+            }
             if (UseMouse)
             {
                 Screen.CursorVisible = false;
@@ -39,7 +44,7 @@ namespace FPS.Control
         /// <inheritdoc/>
         public override void OnUpdate()
         {
-            ControlMove();
+            ControlMotion();
 
             if (Input.GetAction("Fire"))
             {
@@ -47,7 +52,7 @@ namespace FPS.Control
             }
         }
 
-        private void ControlMove()
+        private void ControlMotion()
         {
             float yaw = 0;
             float pitch = 0;
@@ -63,6 +68,7 @@ namespace FPS.Control
             var jump = CanJump && Input.GetAction("Jump");
 
             _playerMovement.AddMovement(horizontal, vertical, pitch, yaw, jump);
+            _fpsMotion.AddMotionInput(new Vector3(yaw, pitch, 0), new Vector3(horizontal, vertical, 0));
         }
 
         private void Attack()

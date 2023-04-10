@@ -8,19 +8,31 @@ namespace FPS.Movement
     /// </summary>
     public class PlayerMovement : Script
     {
+        [EditorOrder(0)]
         public CharacterController PlayerController;
-        public Actor CameraTarget;
-        public Camera Camera;
 
+        [EditorOrder(5), EditorDisplay("Camera Configs")]
+        public Actor CameraTarget;
+        [EditorOrder(6), EditorDisplay("Camera Configs")]
+        public Camera FPSCamera;
+        [EditorOrder(7), EditorDisplay("Camera Configs", "Camera Pitch Range")]
         public Float2 PitchMinMax = new Float2(-88, 88);
+        [EditorOrder(8), EditorDisplay("Camera Configs")]
         public float CameraSmoothing = 20.0f;
+        [EditorOrder(9), EditorDisplay("Camera Configs", "Use Camera Smoothing")]
         public bool IsMotionBlur = true;
 
+        [EditorOrder(10), EditorDisplay("Movement Params")]
         public float JumpForce = 800;
+        [EditorOrder(11), EditorDisplay("Movement Params")]
         public float Friction = 8.0f;
+        [EditorOrder(12), EditorDisplay("Movement Params")]
         public float GroundAccelerate = 5000;
+        [EditorOrder(13), EditorDisplay("Movement Params")]
         public float AirAccelerate = 10000;
+        [EditorOrder(14), EditorDisplay("Movement Params")]
         public float MaxVelocityGround = 400;
+        [EditorOrder(15), EditorDisplay("Movement Params")]
         public float MaxVelocityAir = 200;
 
         private Vector3 _velocity;
@@ -37,6 +49,7 @@ namespace FPS.Movement
         /// <param name="vertical">The vertical input.</param>
         /// <param name="pitch">The pitch rotation input.</param>
         /// <param name="yaw">The yaw rotation input.</param>
+        /// <param name="jump">The boolean indicating whether to jump.</param>
         public void AddMovement(float horizontal, float vertical, float pitch, float yaw, bool jump)
         {
             _pitch = Mathf.Clamp(_pitch + pitch, PitchMinMax.MinValue, PitchMinMax.MaxValue);
@@ -49,14 +62,14 @@ namespace FPS.Movement
         public override void OnFixedUpdate()
         {
             // Update camera
-            var camTrans = Camera.Transform;
+            var camTrans = FPSCamera.Transform;
             var camFactor = Mathf.Saturate(CameraSmoothing * Time.DeltaTime);
             CameraTarget.LocalOrientation = IsMotionBlur
                 ? Quaternion.Lerp(CameraTarget.LocalOrientation, Quaternion.Euler(_pitch, _yaw, 0), camFactor)
                 : Quaternion.Euler(_pitch, _yaw, 0);
             camTrans.Translation = Vector3.Lerp(camTrans.Translation, CameraTarget.Position, camFactor);
             camTrans.Orientation = CameraTarget.Orientation;
-            Camera.Transform = camTrans;
+            FPSCamera.Transform = camTrans;
 
             var inputH = _horizontal;
             var inputV = _vertical;
