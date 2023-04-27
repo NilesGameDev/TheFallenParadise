@@ -34,9 +34,12 @@ namespace FPS.Movement
         public float MaxVelocityGround = 400;
         [EditorOrder(15), EditorDisplay("Movement Params")]
         public float MaxVelocityAir = 200;
+        [EditorOrder(16), EditorDisplay("Movement Params")]
+        public float SprintSpeed = 400;
 
         private Vector3 _velocity;
         private bool _jump;
+        private bool _isSprinting;
         private float _pitch;
         private float _yaw;
         private float _horizontal;
@@ -50,13 +53,14 @@ namespace FPS.Movement
         /// <param name="pitch">The pitch rotation input.</param>
         /// <param name="yaw">The yaw rotation input.</param>
         /// <param name="jump">The boolean indicating whether to jump.</param>
-        public void AddMovement(float horizontal, float vertical, float pitch, float yaw, bool jump)
+        public void AddMovement(float horizontal, float vertical, float pitch, float yaw, bool jump, bool isSprinting)
         {
             _pitch = Mathf.Clamp(_pitch + pitch, PitchMinMax.MinValue, PitchMinMax.MaxValue);
             _yaw += yaw;
             _horizontal += horizontal;
             _vertical += vertical;
             _jump = jump;
+            _isSprinting = isSprinting;
         }
 
         public override void OnFixedUpdate()
@@ -117,7 +121,8 @@ namespace FPS.Movement
             }
 
             // Move
-            PlayerController.Move(velocity * Time.DeltaTime);
+            var speed = _isSprinting ? SprintSpeed : 1;
+            PlayerController.Move(velocity * Time.DeltaTime * speed);
             _velocity = velocity;
         }
 

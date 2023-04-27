@@ -7,6 +7,7 @@ namespace FPS.Combat
     /// </summary>
     public class WeaponManager : Script
     {
+        public Actor WeaponSocket;
         public Prefab WeaponPrefab;
 
         private Actor _currentWeapon;
@@ -15,10 +16,13 @@ namespace FPS.Combat
         public override void OnStart()
         {
             base.OnStart();
-            if (WeaponPrefab == null )
+            if (WeaponPrefab == null)
             {
                 Debug.LogWarning("Weapon Manager should have a weapon prefab attached!");
-                return;
+            }
+            if (WeaponSocket == null)
+            {
+                Debug.LogWarning("Weapon Manager should have a weapon socket");
             }
             EquipWeapon();
         }
@@ -34,7 +38,7 @@ namespace FPS.Combat
         // TODO: Implement this later
         public void EquipWeapon()
         {
-            _currentWeapon = PrefabManager.SpawnPrefab(WeaponPrefab, Actor);
+            _currentWeapon = PrefabManager.SpawnPrefab(WeaponPrefab, WeaponSocket);
         }
     }
 }

@@ -13,6 +13,7 @@ namespace FPS.Combat
         public Actor BulletSpawn;
 
         private WeaponData _weaponData;
+        private float _timeToShoot;
 
         /// <inheritdoc/>
         public override void OnStart()
@@ -33,27 +34,49 @@ namespace FPS.Combat
         
         public void SpawnBullet()
         {
-            var bullet = new RigidBody
+            if (Time.GameTime >= _timeToShoot)
             {
-                Name = "Bullet",
-                StaticFlags = StaticFlags.None,
-                UseCCD = true,
-            };
-            new StaticModel
-            {
-                Model = _weaponData.BulletModel,
-                Parent = bullet,
-                StaticFlags = StaticFlags.None
-            };
-            new SphereCollider
-            {
-                Parent = bullet,
-                StaticFlags = StaticFlags.None
-            };
-            bullet.Transform = bullet.Transform = new Transform(BulletSpawn.Position, Quaternion.Identity, _weaponData.BulletScale);
-            Level.SpawnActor(bullet);
-            bullet.LinearVelocity = BulletSpawn.Direction * _weaponData.ProjectileVelocity;
-            Destroy(bullet, _weaponData.BulletLifetime);
+                UpdateNextTimeToShoot();
+
+                var bullet = new RigidBody
+                {
+                    Name = "Bullet",
+                    StaticFlags = StaticFlags.None,
+                    UseCCD = true,
+                };
+                new StaticModel
+                {
+                    Model = _weaponData.BulletModel,
+                    Parent = bullet,
+                    StaticFlags = StaticFlags.None
+                };
+                var collider = new SphereCollider
+                {
+                    Parent = bullet,
+                    StaticFlags = StaticFlags.None
+                };
+
+                // TODO: Find a way to better implement this damage deal
+                collider.CollisionEnter += (Collision collision) =>
+                {
+                    if (collision.OtherActor.TryGetScript(out EnemyStats enemyStats))
+                    {
+                        enemyStats.TakeDamage(_weaponData.Damage);
+                    }
+                };
+
+                bullet.Transform = bullet.Transform = new Transform(BulletSpawn.Position, Quaternion.Identity, _weaponData.BulletScale);
+                Level.SpawnActor(bullet);
+
+                // TODO: Better bullet velocity implementation
+                bullet.LinearVelocity = BulletSpawn.Direction * _weaponData.ProjectileVelocity;
+                Destroy(bullet, _weaponData.BulletLifetime);
+            }
+        }
+
+        private void UpdateNextTimeToShoot()
+        {
+            _timeToShoot = Time.GameTime + 1f / _weaponData.FireRate;
         }
     }
 }
