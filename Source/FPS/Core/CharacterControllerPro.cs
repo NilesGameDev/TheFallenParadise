@@ -1,7 +1,6 @@
 ﻿// Copyright © 2022 PrecisionRender. All rights reserved.
 // Thanks a lot for this amazing library
 
-using ArizonaFramework;
 using FlaxEngine;
 
 namespace FPS.Core

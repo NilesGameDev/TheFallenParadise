@@ -7,6 +7,7 @@ namespace FPS.Movement
     /// </summary>
     public class FpsMotion : Script
     {
+        [ExpandGroups]
         [EditorOrder(0), EditorDisplay("General Settings")]
         public CharacterController Player;
         [EditorOrder(1), EditorDisplay("General Settings")]
@@ -20,6 +21,7 @@ namespace FPS.Movement
         [EditorOrder(5), EditorDisplay("General Settings")]
         public float SmoothRotation = 12f;
 
+        [ExpandGroups]
         [EditorOrder(10), EditorDisplay("Sway Settings")]
         public float Step = 0.01f;
         [EditorOrder(11), EditorDisplay("Sway Settings")]
@@ -29,6 +31,7 @@ namespace FPS.Movement
         [EditorOrder(13), EditorDisplay("Sway Settings")]
         public Float2 RotationStepDistanceMinMax = new Float2(-5f, 5f);
 
+        [ExpandGroups]
         [EditorOrder(20), EditorDisplay("Bob Settings")]
         public float SpeedCurve;
         [EditorOrder(21), EditorDisplay("Bob Settings")]
@@ -39,6 +42,7 @@ namespace FPS.Movement
         public Vector3 Multiplier = Vector3.One * 2;
         [EditorOrder(24), EditorDisplay("Bob Settings"), ExpandGroups]
         public float bobExaggeration;
+        
         private float _curveSin { get => Mathf.Sin(SpeedCurve); }
         private float _curveCos { get => Mathf.Cos(SpeedCurve); }
 

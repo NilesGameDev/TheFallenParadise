@@ -1,24 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using FlaxEngine;
+﻿using FlaxEngine;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace FPS
+namespace FPS.Core
 {
     /// <summary>
     /// WeatherSystem Script.
     /// </summary>
     public class WeatherSystem : Script
     {
+        public float BaseColdRate = 0.4f;
+        public int ApplyIntervalMs = 400;
+        
+        public static event Action<float> OnAffectWorld;
+
+        private CancellationTokenSource _cancelToken = new CancellationTokenSource();
+        private Task _asyncEmbraceColdnessTask;
+
         /// <inheritdoc/>
         public override void OnStart()
         {
-            // Here you can add code that needs to be called when script is created, just before the first game update
+            _asyncEmbraceColdnessTask = Task.Run(EmbraceExtremeColdness, _cancelToken.Token);
         }
         
         /// <inheritdoc/>
         public override void OnEnable()
         {
-            // Here you can add code that needs to be called when script is enabled (eg. register for events)
+            
         }
 
         /// <inheritdoc/>
@@ -27,10 +36,33 @@ namespace FPS
             // Here you can add code that needs to be called when script is disabled (eg. unregister from events)
         }
 
-        /// <inheritdoc/>
-        public override void OnUpdate()
+        public override void OnDestroy()
         {
-            // Here you can add code that needs to be called every frame
+            if (_asyncEmbraceColdnessTask != null) {
+                _cancelToken.Cancel();
+                _asyncEmbraceColdnessTask.Wait(100);
+            }
+        }
+
+        private async Task EmbraceExtremeColdness()
+        {
+            while (true)
+            {
+                try
+                {
+                    OnAffectWorld?.Invoke(BaseColdRate);
+                    await Task.Delay(ApplyIntervalMs, _cancelToken.Token);
+                } catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                    return;
+                }
+
+                if (_cancelToken.IsCancellationRequested)
+                {
+                    return;
+                }
+            }
         }
     }
 }
