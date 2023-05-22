@@ -21,6 +21,7 @@ namespace FPS.Movement
         [EditorOrder(5), EditorDisplay("General Settings")]
         public float SmoothRotation = 12f;
 
+
         [ExpandGroups]
         [EditorOrder(10), EditorDisplay("Sway Settings")]
         public float Step = 0.01f;

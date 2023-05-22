@@ -8,10 +8,7 @@
 	"References": [
 		{
 			"Name": "$(EnginePath)/Flax.flaxproj"
-		},
-    		{
-        		"Name": "$(ProjectPath)/Plugins/ArizonaFramework/ArizonaFramework.flaxproj"
-    		}
+		}
 	],
 	"DefaultSceneSpawn": {
 		"Position": {

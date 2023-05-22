@@ -1,4 +1,5 @@
 ﻿using FlaxEngine;
+using FPS.Data.Guns;
 
 namespace FPS.Combat
 {
@@ -8,37 +9,42 @@ namespace FPS.Combat
     public class WeaponManager : Script
     {
         public Actor WeaponSocket;
-        public Prefab WeaponPrefab;
+        public GunType Gun;
 
-        private Actor _currentWeapon;
+        [AssetReference(typeof(Gun))]
+        public JsonAsset GunAsset;
+
+        private Gun _currentGun;
 
         /// <inheritdoc/>
         public override void OnStart()
         {
             base.OnStart();
-            if (WeaponPrefab == null)
-            {
-                Debug.LogWarning("Weapon Manager should have a weapon prefab attached!");
-            }
             if (WeaponSocket == null)
             {
                 Debug.LogWarning("Weapon Manager should have a weapon socket");
             }
+            _currentGun = GunAsset.CreateInstance<Gun>();
             EquipWeapon();
+        }
+
+        public void SelectGun()
+        {
+
         }
 
         public void CreateBullet()
         {
-            if (_currentWeapon.TryGetScript(out Weapon script))
+            if (_currentGun != null)
             {
-                script.SpawnBullet();
+                _currentGun.Shoot();
             }
         }
 
         // TODO: Implement this later
         public void EquipWeapon()
         {
-            _currentWeapon = PrefabManager.SpawnPrefab(WeaponPrefab, WeaponSocket);
+            _currentGun.Spawn(WeaponSocket, this);
         }
     }
 }
