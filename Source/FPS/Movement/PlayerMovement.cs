@@ -53,6 +53,7 @@ namespace FPS.Movement
         /// <param name="pitch">The pitch rotation input.</param>
         /// <param name="yaw">The yaw rotation input.</param>
         /// <param name="jump">The boolean indicating whether to jump.</param>
+        /// <param name="isSprinting">Specify if the actor is sprinting</param>
         public void AddMovement(float horizontal, float vertical, float pitch, float yaw, bool jump, bool isSprinting)
         {
             _pitch = Mathf.Clamp(_pitch + pitch, PitchMinMax.MinValue, PitchMinMax.MaxValue);

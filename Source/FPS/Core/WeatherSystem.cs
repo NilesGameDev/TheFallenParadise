@@ -1,7 +1,7 @@
-﻿using FlaxEngine;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using FlaxEngine;
 
 namespace FPS.Core
 {
@@ -12,7 +12,7 @@ namespace FPS.Core
     {
         public float BaseColdRate = 0.4f;
         public int ApplyIntervalMs = 400;
-        
+
         public static event Action<float> OnAffectWorld;
 
         private CancellationTokenSource _cancelToken = new CancellationTokenSource();
@@ -23,11 +23,11 @@ namespace FPS.Core
         {
             _asyncEmbraceColdnessTask = Task.Run(EmbraceExtremeColdness, _cancelToken.Token);
         }
-        
+
         /// <inheritdoc/>
         public override void OnEnable()
         {
-            
+
         }
 
         /// <inheritdoc/>
@@ -38,7 +38,8 @@ namespace FPS.Core
 
         public override void OnDestroy()
         {
-            if (_asyncEmbraceColdnessTask != null) {
+            if (_asyncEmbraceColdnessTask != null)
+            {
                 _cancelToken.Cancel();
                 _asyncEmbraceColdnessTask.Wait(100);
             }
@@ -52,7 +53,8 @@ namespace FPS.Core
                 {
                     OnAffectWorld?.Invoke(BaseColdRate);
                     await Task.Delay(ApplyIntervalMs, _cancelToken.Token);
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Debug.LogException(ex);
                     return;
