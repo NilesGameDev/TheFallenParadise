@@ -37,7 +37,7 @@ namespace FPS.Combat
         {
             if (_currentGun != null)
             {
-                _currentGun.Shoot();
+                _currentGun.Tick(Input.Mouse.GetButton(MouseButton.Left));
             }
         }
 
