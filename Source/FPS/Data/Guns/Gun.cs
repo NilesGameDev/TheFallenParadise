@@ -1,24 +1,25 @@
 ﻿using FlaxEngine;
 
 using FPS.Core;
-using FPS.Combat;
 using FPS.Data.Impacts;
-using System.Runtime.InteropServices;
 
 namespace FPS.Data.Guns
 {
     [ContentContextMenu("New/Data/Guns/Gun")]
     public class Gun
     {
-        // TODO: Check null for the nullable fields
-        public GunType Type;
         public string Name;
+        public GunType Type;
+        public ImpactType ImpactType;
         public Prefab GunPrefab;
         public Vector3 SpawnPoint;
         public Vector3 SpawnRotation;
         public ParticleSystem TrailSystem;
-        public ImpactType ImpactType;
         public AudioClip ShotSFX;
+
+        [Header("Grip Points")]
+        public Vector3 RightGripPosition;
+        public Vector3 LeftGripPosition;
 
         [AssetReference(typeof(ShootConfig))]
         public JsonAsset ShootConfig;
@@ -71,9 +72,11 @@ namespace FPS.Data.Guns
 
                 var spreadAmount = _shootConfig.GetSpread(Time.GameTime - _initClickTime);
                 var spreadDirection = _gunActor.Transform.TransformDirection(spreadAmount);
-                var targetRotation = Quaternion.Slerp(_gunActor.Orientation, 
-                    Quaternion.LookRotation(spreadDirection, _gunActor.Transform.Up) * 0.1f, 10 * Time.DeltaTime);
-                Debug.Log(Quaternion.LookRotation(spreadDirection, _gunActor.Transform.Up));
+                var targetRotation = Quaternion.Slerp(
+                    _gunActor.Orientation,
+                    Quaternion.LookRotation(spreadDirection, _gunActor.Transform.Up) * 0.1f,
+                    10 * Time.DeltaTime // TODO: Consider use a configurable to change this lerp rate
+                );
                 _gunActor.Orientation = targetRotation;
                 var shootDirection = _gunActor.Transform.Forward;
 
@@ -83,7 +86,7 @@ namespace FPS.Data.Guns
                     effect.SetParameterValue("PE_BulletTrail", "AllowShoot", true);
                     effect.SetParameterValue("PE_BulletTrail", "HitTarget", hit.Point);
                     effect.SetParameterValue("PE_BulletTrail", "SimulationSpeed", _trailConfig.SimulationSpeed);
-                    
+
                     if (hit.Collider != null)
                     {
                         SurfaceManager.Instance.HandleImpact(hit.Collider, hit.Point, hit.Normal, ImpactType);
@@ -107,6 +110,8 @@ namespace FPS.Data.Guns
 
         public void Spawn(Actor parent, Script activeScript)
         {
+            ValidateGunProperties();
+
             _activeScript = activeScript;
             _lastShootTime = 0;
 
@@ -117,9 +122,27 @@ namespace FPS.Data.Guns
 
             _gunActor = PrefabManager.SpawnPrefab(GunPrefab, parent);
             _gunActor.LocalPosition = SpawnPoint;
-            //_gunActor.Orientation = Quaternion.Euler(SpawnRotation);
 
-            _bulletSpawn = _gunActor.GetScript<Weapon>().BulletSpawn;
+            _bulletSpawn = _gunActor.GetScript<Weapon>()?.BulletSpawn;
+            if (_bulletSpawn is null)
+            {
+                Debug.LogWarning("Can not find bullet spawn actor in the given gun prefab. Make sure to have the script Weapon attached to it and assign a bullet spawn!");
+            }
         }
+
+#if FLAX_EDITOR
+        private void ValidateGunProperties()
+        {
+            if (GunPrefab is null)
+            {
+                Debug.LogWarning("GunPrefab is null, remember to assign JsonAsset to it!");
+            }
+
+            if (TrailSystem is null)
+            {
+                Debug.LogWarning("TrailSystem is null, without it the effect of bullet will not be handled correctly!");
+            }
+        }
+#endif
     }
 }

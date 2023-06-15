@@ -1,6 +1,6 @@
 ﻿using FlaxEngine;
 
-namespace FPS.Combat
+namespace FPS.Data
 {
     /// <summary>
     /// Weapon Script.
