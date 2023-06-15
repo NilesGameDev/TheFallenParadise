@@ -18,8 +18,8 @@ namespace FPS.Core
         public override void OnStart()
         {
             _animatedArms = Actor.As<AnimatedModel>();
-            _rightGripParam = _animatedArms.GetParameter("TargetWeapon");
-            _leftGripParam = _animatedArms.GetParameter("TargetWeapon2");
+            _rightGripParam = _animatedArms.GetParameter("RightGrip");
+            _leftGripParam = _animatedArms.GetParameter("LeftGrip");
             _rightGripParam.Value = Transform.WorldToLocal(RightGrip.Transform).Translation;
             _leftGripParam.Value = Transform.WorldToLocal(LeftGrip.Transform).Translation;
         }
