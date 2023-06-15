@@ -8,5 +8,7 @@ namespace FPS.Data
     public class Weapon : Script
     {
         public Actor BulletSpawn;
+        public Actor RightGrip;
+        public Actor LeftGrip;
     }
 }

@@ -108,7 +108,7 @@ namespace FPS.Data.Guns
             }
         }
 
-        public void Spawn(Actor parent, Script activeScript)
+        public void Spawn(Actor parent, Script activeScript, out Actor rightGrip, out Actor leftGrip)
         {
             ValidateGunProperties();
 
@@ -123,11 +123,15 @@ namespace FPS.Data.Guns
             _gunActor = PrefabManager.SpawnPrefab(GunPrefab, parent);
             _gunActor.LocalPosition = SpawnPoint;
 
-            _bulletSpawn = _gunActor.GetScript<Weapon>()?.BulletSpawn;
+            var weaponScript = _gunActor.GetScript<Weapon>();
+            _bulletSpawn = weaponScript?.BulletSpawn;
             if (_bulletSpawn is null)
             {
                 Debug.LogWarning("Can not find bullet spawn actor in the given gun prefab. Make sure to have the script Weapon attached to it and assign a bullet spawn!");
             }
+
+            rightGrip = weaponScript.RightGrip;
+            leftGrip = weaponScript.LeftGrip;
         }
 
 #if FLAX_EDITOR
