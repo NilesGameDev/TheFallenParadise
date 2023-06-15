@@ -47,15 +47,15 @@ namespace FPS.Data.Guns
         public Vector3 GetSpread(float shootTime = 0)
         {
             var spread = Vector3.Zero;
-
             if (SpreadType == BulletSpreadType.Simple)
             {
-                spread = Vector3.Lerp(spread, new Vector3(
+                var randomSpread = new Vector3(
                     RandomUtil.Random.NextFloat(-Spread.X, Spread.X),
                     RandomUtil.Random.NextFloat(-Spread.Y, Spread.Y),
                     RandomUtil.Random.NextFloat(-Spread.Z, Spread.Z)
-                    ),
-                    Mathf.Saturate(shootTime / MaxSpreadTime));
+                );
+                spread = Vector3.Lerp(spread, randomSpread, Mathf.Saturate(shootTime / MaxSpreadTime));
+                //spread = Vector3.Lerp(spread, randomSpread, 1);
             }
             else if (SpreadType == BulletSpreadType.TextureBased)
             {

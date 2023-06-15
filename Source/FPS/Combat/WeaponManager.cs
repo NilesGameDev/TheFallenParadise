@@ -27,6 +27,10 @@ namespace FPS.Combat
             _currentGun = GunAsset.CreateInstance<Gun>();
             EquipWeapon();
         }
+        public override void OnUpdate()
+        {
+            _currentGun.Tick(Input.Mouse.GetButton(MouseButton.Left));
+        }
 
         public void SelectGun()
         {
@@ -34,11 +38,11 @@ namespace FPS.Combat
         }
 
         public void CreateBullet()
-        {
-            if (_currentGun != null)
-            {
-                _currentGun.Tick(Input.Mouse.GetButton(MouseButton.Left));
-            }
+        { 
+            //if (_currentGun != null)
+            //{
+            //    _currentGun.Tick(Input.Mouse.GetButton(MouseButton.Left));
+            //}
         }
 
         // TODO: Implement this later

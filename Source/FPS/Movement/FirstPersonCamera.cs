@@ -1,6 +1,6 @@
 ﻿// Copyright © 2022 PrecisionRender. All rights reserved.
-
 using FlaxEngine;
+
 using FPS.Core;
 
 namespace FPS

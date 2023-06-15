@@ -3,6 +3,7 @@
 using FPS.Core;
 using FPS.Combat;
 using FPS.Data.Impacts;
+using System.Runtime.InteropServices;
 
 namespace FPS.Data.Guns
 {
@@ -69,7 +70,11 @@ namespace FPS.Data.Guns
                 _lastShootTime = Time.GameTime;
 
                 var spreadAmount = _shootConfig.GetSpread(Time.GameTime - _initClickTime);
-                _gunActor.Orientation += Quaternion.LookRotation(spreadAmount);
+                var spreadDirection = _gunActor.Transform.TransformDirection(spreadAmount);
+                var targetRotation = Quaternion.Slerp(_gunActor.Orientation, 
+                    Quaternion.LookRotation(spreadDirection, _gunActor.Transform.Up) * 0.1f, 10 * Time.DeltaTime);
+                Debug.Log(Quaternion.LookRotation(spreadDirection, _gunActor.Transform.Up));
+                _gunActor.Orientation = targetRotation;
                 var shootDirection = _gunActor.Transform.Forward;
 
                 if (Physics.RayCast(_bulletSpawn.Position, shootDirection, out RayCastHit hit, float.MaxValue, _shootConfig.HitMask))
@@ -78,7 +83,7 @@ namespace FPS.Data.Guns
                     effect.SetParameterValue("PE_BulletTrail", "AllowShoot", true);
                     effect.SetParameterValue("PE_BulletTrail", "HitTarget", hit.Point);
                     effect.SetParameterValue("PE_BulletTrail", "SimulationSpeed", _trailConfig.SimulationSpeed);
-
+                    
                     if (hit.Collider != null)
                     {
                         SurfaceManager.Instance.HandleImpact(hit.Collider, hit.Point, hit.Normal, ImpactType);
@@ -92,11 +97,11 @@ namespace FPS.Data.Guns
                     effect.SetParameterValue("PE_BulletTrail", "SimulationSpeed", _trailConfig.SimulationSpeed);
                 }
 
-                var audioSource = new AudioSource();
-                audioSource.Parent = _bulletSpawn;
-                audioSource.PlayOnStart = false;
-                audioSource.Clip = ShotSFX;
-                audioSource.Play();
+                //var audioSource = new AudioSource();
+                //audioSource.Parent = _bulletSpawn;
+                //audioSource.PlayOnStart = false;
+                //audioSource.Clip = ShotSFX;
+                //audioSource.Play();
             }
         }
 
@@ -111,9 +116,8 @@ namespace FPS.Data.Guns
             _shootConfig.CacheTexturePixels();
 
             _gunActor = PrefabManager.SpawnPrefab(GunPrefab, parent);
-            // TODO: Will implement this later after finish IK
-            //_gunActor.LocalPosition = SpawnPoint;
-            //_gunActor.LocalOrientation = Quaternion.Euler(SpawnRotation);
+            _gunActor.LocalPosition = SpawnPoint;
+            //_gunActor.Orientation = Quaternion.Euler(SpawnRotation);
 
             _bulletSpawn = _gunActor.GetScript<Weapon>().BulletSpawn;
         }
