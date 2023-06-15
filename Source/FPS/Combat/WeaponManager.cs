@@ -8,7 +8,6 @@ namespace FPS.Combat
     /// </summary>
     public class WeaponManager : Script
     {
-        public Actor WeaponSocket;
         public GunType Gun;
 
         [AssetReference(typeof(Gun))]
@@ -19,11 +18,6 @@ namespace FPS.Combat
         /// <inheritdoc/>
         public override void OnStart()
         {
-            base.OnStart();
-            if (WeaponSocket == null)
-            {
-                Debug.LogWarning("Weapon Manager should have a weapon socket");
-            }
             _currentGun = GunAsset.CreateInstance<Gun>();
             EquipWeapon();
         }
@@ -32,23 +26,20 @@ namespace FPS.Combat
             _currentGun.Tick(Input.Mouse.GetButton(MouseButton.Left));
         }
 
+        public void Fire(bool isInputPressing)
+        {
+            _currentGun.Tick(isInputPressing);
+        }
+
         public void SelectGun()
         {
 
         }
 
-        public void CreateBullet()
-        { 
-            //if (_currentGun != null)
-            //{
-            //    _currentGun.Tick(Input.Mouse.GetButton(MouseButton.Left));
-            //}
-        }
-
         // TODO: Implement this later
         public void EquipWeapon()
         {
-            _currentGun.Spawn(WeaponSocket, this);
+            _currentGun.Spawn(Actor, this);
         }
     }
 }

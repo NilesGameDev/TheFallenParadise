@@ -20,6 +20,7 @@ namespace FPS.Control
         private CharacterControllerPro _playerController;
         private FirstPersonCamera _fpsCamera;
         private FpsMotion _fpsMotion;
+        private WeaponManager _weaponManager;
 
         /// <inheritdoc/>
         public override void OnStart()
@@ -40,6 +41,10 @@ namespace FPS.Control
             if (!Actor.TryGetScript(out _fpsMotion))
             {
                 Debug.LogWarning($"No FpsMotion script is attached to the {className}!");
+            }
+            if (!WeaponHolder.TryGetScript(out _weaponManager))
+            {
+                Debug.LogWarning("WeaponHolder actor does not have WeaponManager script attached!");
             }
         }
 
@@ -109,10 +114,7 @@ namespace FPS.Control
 
         private void InteractCombat()
         {
-            if (Input.GetAction("Fire"))
-            {
-                Attack();
-            }
+            _weaponManager.Fire(Input.Mouse.GetButton(MouseButton.Left));
         }
 
         private void GetRotationInput(out float yaw, out float pitch)
@@ -123,14 +125,6 @@ namespace FPS.Control
             {
                 yaw = Input.GetAxis("Mouse X");
                 pitch = Input.GetAxis("Mouse Y");
-            }
-        }
-
-        private void Attack()
-        {
-            if (WeaponHolder.TryGetScript(out WeaponManager script))
-            {
-                script.CreateBullet();
             }
         }
     }
