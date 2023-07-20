@@ -2,6 +2,7 @@
 
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 
 [assembly: AssemblyTitle("Game")]
 [assembly: AssemblyDescription("")]
@@ -15,3 +16,4 @@ using System.Runtime.InteropServices;
 [assembly: Guid("7c85a97f-d101-ede0-c294-453405150000")]
 [assembly: AssemblyVersion("1.0")]
 [assembly: AssemblyFileVersion("1.0")]
+[assembly: DisableRuntimeMarshalling]
